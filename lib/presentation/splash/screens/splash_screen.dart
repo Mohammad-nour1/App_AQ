@@ -18,7 +18,7 @@ class SplashScreen extends StatelessWidget {
       child: BlocListener<SplashCubit, SplashCubitState>(
         listener: (context, state) {
           if (state is SplashCompleted) {
-            context.go(RoutePaths.home);
+            context.go(RoutePaths.homeMap);
           }
         },
         child: Scaffold(
@@ -35,23 +35,16 @@ class SplashScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(
-                    Icons.play_arrow_rounded,
+                    Icons.explore_rounded,
                     size: 48,
                     color: AppColors.black,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  'App Name',
+                  'Rahhal',
                   style: AppTextStyles.headlineLarge.copyWith(
                     color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Loading...',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
                   ),
                 ),
               ],

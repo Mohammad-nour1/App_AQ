@@ -3,8 +3,18 @@ import 'package:go_router/go_router.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 import '../../presentation/splash/screens/splash_screen.dart';
+import '../../presentation/onboarding/screens/onboarding_screen.dart';
+import '../../presentation/auth/screens/login_screen.dart';
+import '../../presentation/auth/screens/register_screen.dart';
 import '../../presentation/navigation/screens/app_shell_screen.dart';
-import '../../presentation/home/screens/home_screen.dart';
+import '../../presentation/home/screens/home_map_screen.dart';
+import '../../presentation/place/screens/place_details_screen.dart';
+import '../../presentation/place/screens/add_place_screen.dart';
+import '../../presentation/search/screens/search_screen.dart';
+import '../../presentation/nearby/screens/nearby_places_screen.dart';
+import '../../presentation/trip/screens/trip_suggestion_screen.dart';
+import '../../presentation/favorites/screens/favorites_screen.dart';
+import '../../presentation/profile/screens/profile_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -24,6 +34,45 @@ GoRouter createAppRouter() {
           },
         ),
       ),
+      GoRoute(
+        path: RoutePaths.onboarding,
+        name: RouteNames.onboarding,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const OnboardingScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.login,
+        name: RouteNames.login,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const LoginScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.register,
+        name: RouteNames.register,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const RegisterScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(1, 0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return AppShellScreen(navigationShell: navigationShell);
@@ -32,11 +81,56 @@ GoRouter createAppRouter() {
           StatefulShellBranch(
             routes: <RouteBase>[
               GoRoute(
-                path: RoutePaths.home,
-                name: RouteNames.home,
+                path: RoutePaths.homeMap,
+                name: RouteNames.homeMap,
                 pageBuilder: (context, state) => CustomTransitionPage<void>(
                   key: state.pageKey,
-                  child: const HomeScreen(),
+                  child: const HomeMapScreen(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RoutePaths.search,
+                name: RouteNames.search,
+                pageBuilder: (context, state) => CustomTransitionPage<void>(
+                  key: state.pageKey,
+                  child: const SearchScreen(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RoutePaths.favorites,
+                name: RouteNames.favorites,
+                pageBuilder: (context, state) => CustomTransitionPage<void>(
+                  key: state.pageKey,
+                  child: const FavoritesScreen(),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return FadeTransition(opacity: animation, child: child);
+                  },
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: <RouteBase>[
+              GoRoute(
+                path: RoutePaths.profile,
+                name: RouteNames.profile,
+                pageBuilder: (context, state) => CustomTransitionPage<void>(
+                  key: state.pageKey,
+                  child: const ProfileScreen(),
                   transitionsBuilder: (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
@@ -45,6 +139,65 @@ GoRouter createAppRouter() {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: RoutePaths.placeDetails,
+        name: RouteNames.placeDetails,
+        pageBuilder: (context, state) {
+          final placeId = state.pathParameters['id'] ?? '';
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: PlaceDetailsScreen(placeId: placeId),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: RoutePaths.addPlace,
+        name: RouteNames.addPlace,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const AddPlaceScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.nearbyPlaces,
+        name: RouteNames.nearbyPlaces,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const NearbyPlacesScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.tripSuggestion,
+        name: RouteNames.tripSuggestion,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const TripSuggestionScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
       ),
     ],
   );
