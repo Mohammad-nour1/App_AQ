@@ -19,4 +19,37 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color transparent = Color(0x00000000);
+
+  static const Color glassBackground = Color(0x1AFFFFFF);
+  static const Color glassBorder = Color(0x33FFFFFF);
+  static const Color glassHighlight = Color(0x1AFFFFFF);
+  static const Color glassShadow = Color(0x40000000);
+
+  static const Color shimmerBase = Color(0xFF1A263D);
+  static const Color shimmerHighlight = Color(0xFF2B3B58);
+
+  static const Color overlayLight = Color(0x80000000);
+  static const Color overlayDark = Color(0xCC000000);
+  static const Color overlayAccent = Color(0x3336FFDB);
+}
+
+class AppOpacity {
+  AppOpacity._();
+
+  static const double none = 0.0;
+  static const double light = 0.05;
+  static const double low = 0.10;
+  static const double medium = 0.20;
+  static const double high = 0.30;
+  static const double semi = 0.50;
+  static const double strong = 0.70;
+  static const double full = 1.0;
+
+  static const double disabled = 0.40;
+  static const double hint = 0.50;
+  static const double secondary = 0.70;
+
+  static const double glassBackground = 0.10;
+  static const double glassBorder = 0.20;
+  static const double glassHighlight = 0.10;
 }
