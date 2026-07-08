@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../presentation/auth/register_screen.dart';
+import '../../presentation/profile/profile_screen.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 import '../../presentation/splash/screens/splash_screen.dart';
@@ -17,13 +18,11 @@ GoRouter createAppRouter() {
     initialLocation: RoutePaths.splash,
     redirect: (context, state) {
       if (state.matchedLocation == RoutePaths.splash) {
-        return AuthService.isLoggedIn ? RoutePaths.home : RoutePaths.login;
+        return RoutePaths.profile; // <-- غيّر هذا السطر
       }
-
       if (state.matchedLocation == RoutePaths.home && !AuthService.isLoggedIn) {
         return RoutePaths.login;
       }
-
       return null;
     },
     routes: <RouteBase>[
@@ -55,6 +54,17 @@ GoRouter createAppRouter() {
         pageBuilder: (context, state) => CustomTransitionPage<void>(
           key: state.pageKey,
           child: const RegisterScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.profile,
+        name: RouteNames.profile,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const ProfileScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
