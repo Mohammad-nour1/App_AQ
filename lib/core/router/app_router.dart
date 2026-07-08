@@ -127,7 +127,7 @@ GoRouter createAppRouter() {
       ),
 
       // ------------------- 4. صفحات الفريق (أحمد ومحمد) -------------------
-      GoRoute(
+      /*GoRoute(
         path: RoutePaths.placeDetails,
         name: RouteNames.placeDetails,
         pageBuilder: (context, state) => CustomTransitionPage<void>(
@@ -137,7 +137,7 @@ GoRouter createAppRouter() {
             return FadeTransition(opacity: animation, child: child);
           },
         ),
-      ),
+      ),*/
       GoRoute(
         path: RoutePaths.nearby,
         name: RouteNames.nearby,

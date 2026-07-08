@@ -22,16 +22,11 @@ class LoginScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppSpacing.xxl),
-              Text(
-                'Welcome Back',
-                style: AppTextStyles.headlineLarge,
-              ),
+              Text('Welcome Back', style: AppTextStyles.headlineLarge),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Sign in to continue',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: AppSpacing.xxl),
               const AppTextField(
@@ -40,29 +35,16 @@ class LoginScreen extends StatelessWidget {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: AppSpacing.lg),
-              const AppTextField(
-                label: 'Password',
-                hint: 'Enter your password',
-                obscureText: true,
-              ),
+              const AppTextField(label: 'Password', hint: 'Enter your password', obscureText: true),
               const SizedBox(height: AppSpacing.md),
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text('Forgot Password?'),
-                ),
+                child: TextButton(onPressed: () {}, child: const Text('Forgot Password?')),
               ),
               const SizedBox(height: AppSpacing.lg),
-              PrimaryButton(
-                label: 'Sign In',
-                onPressed: () => context.go(RoutePaths.homeMap),
-              ),
+              PrimaryButton(label: 'Sign In', onPressed: () => context.go(RoutePaths.home)),
               const SizedBox(height: AppSpacing.lg),
-              SecondaryButton(
-                label: 'Create an account',
-                onPressed: () => context.go(RoutePaths.register),
-              ),
+              SecondaryButton(label: 'Create an account', onPressed: () => context.go(RoutePaths.register)),
             ],
           ),
         ),

@@ -22,22 +22,14 @@ class RegisterScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppSpacing.xxl),
-              Text(
-                'Create Account',
-                style: AppTextStyles.headlineLarge,
-              ),
+              Text('Create Account', style: AppTextStyles.headlineLarge),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 'Sign up to get started',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
               ),
               const SizedBox(height: AppSpacing.xxl),
-              const AppTextField(
-                label: 'Full Name',
-                hint: 'Enter your name',
-              ),
+              const AppTextField(label: 'Full Name', hint: 'Enter your name'),
               const SizedBox(height: AppSpacing.lg),
               const AppTextField(
                 label: 'Email',
@@ -45,16 +37,9 @@ class RegisterScreen extends StatelessWidget {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: AppSpacing.lg),
-              const AppTextField(
-                label: 'Password',
-                hint: 'Create a password',
-                obscureText: true,
-              ),
+              const AppTextField(label: 'Password', hint: 'Create a password', obscureText: true),
               const SizedBox(height: AppSpacing.lg),
-              PrimaryButton(
-                label: 'Sign Up',
-                onPressed: () => context.go(RoutePaths.homeMap),
-              ),
+              PrimaryButton(label: 'Sign Up', onPressed: () => context.go(RoutePaths.home)),
               const SizedBox(height: AppSpacing.lg),
               SecondaryButton(
                 label: 'Already have an account',
