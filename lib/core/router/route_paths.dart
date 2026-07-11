@@ -10,6 +10,7 @@ class RoutePaths {
   static const String addPlace = '/add-place';
   static const String favorites = '/favorites';
   static const String search = '/search';
+  static const String filter = '/filter';
   static const String nearbyPlaces = '/nearby';
   static const String tripSuggestion = '/trip';
   static const String profile = '/profile';

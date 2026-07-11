@@ -13,4 +13,5 @@ class RouteNames {
   static const String nearbyPlaces = 'nearby-places';
   static const String tripSuggestion = 'trip-suggestion';
   static const String profile = 'profile';
+  static const String filter = 'filter';
 }
