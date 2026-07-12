@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
-// Imports الخاصة بالفريق
 import '../../presentation/splash/screens/splash_screen.dart';
 import '../../presentation/onboarding/screens/onboarding_screen.dart';
 import '../../presentation/navigation/screens/app_shell_screen.dart';
@@ -13,7 +12,6 @@ import '../../presentation/place/screens/add_place_screen.dart';
 import '../../presentation/nearby/screens/nearby_places_screen.dart';
 import '../../presentation/trip/screens/trip_suggestion_screen.dart';
 
-// Imports الخاصة بأيهم (مع المسار الجديد مجلد screens/)
 import '../../presentation/auth/screens/login_screen.dart';
 import '../../presentation/auth/screens/register_screen.dart';
 import '../../presentation/profile/screens/profile_screen.dart';
@@ -29,13 +27,10 @@ GoRouter createAppRouter() {
     navigatorKey: _rootNavigatorKey,
     initialLocation: RoutePaths.splash,
     redirect: (context, state) {
-      // --- منطق التوجيه الأساسي ---
       if (state.matchedLocation == RoutePaths.splash) {
-        // 🔥 غيّر هذا السطر إذا بدك تروح للـ Home أو Login بدل Favorites
-        return AuthService.isLoggedIn ? RoutePaths.favorites : RoutePaths.login;
+        return RoutePaths.addPlace; // يودي لشاشة الإضافة
       }
 
-      // منع الوصول للـ Home إذا كان غير مسجل
       if (state.matchedLocation == RoutePaths.home && !AuthService.isLoggedIn) {
         return RoutePaths.login;
       }
@@ -43,7 +38,6 @@ GoRouter createAppRouter() {
       return null;
     },
     routes: <RouteBase>[
-      // ------------------- 1. صفحات البداية -------------------
       GoRoute(
         path: RoutePaths.splash,
         name: RouteNames.splash,
@@ -67,7 +61,6 @@ GoRouter createAppRouter() {
         ),
       ),
 
-      // ------------------- 2. المصادقة (Auth) -------------------
       GoRoute(
         path: RoutePaths.login,
         name: RouteNames.login,
@@ -91,7 +84,6 @@ GoRouter createAppRouter() {
         ),
       ),
 
-      // ------------------- 3. صفحات أيهم -------------------
       GoRoute(
         path: RoutePaths.profile,
         name: RouteNames.profile,
@@ -126,7 +118,6 @@ GoRouter createAppRouter() {
         ),
       ),
 
-      // ------------------- 4. صفحات الفريق (أحمد ومحمد) -------------------
       /*GoRoute(
         path: RoutePaths.placeDetails,
         name: RouteNames.placeDetails,
@@ -161,7 +152,6 @@ GoRouter createAppRouter() {
         ),
       ),
 
-      // ------------------- 5. الهيكل الرئيسي (شريط سفلي) -------------------
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return AppShellScreen(navigationShell: navigationShell);
@@ -182,7 +172,6 @@ GoRouter createAppRouter() {
               ),
             ],
           ),
-          // باقي الأقسام سيضيفها محمد لاحقاً داخل الـ Shell
         ],
       ),
     ],
