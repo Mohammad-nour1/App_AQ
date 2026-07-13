@@ -1,4 +1,4 @@
-import 'dart:io'; // هذا السطر مهم جداً للتعامل مع الملفات
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,16 +6,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_spacing.dart';
+import '../../../core/constants/app_text_styles.dart';
 import '../../../core/router/route_paths.dart';
+import '../../../core/widgets/glass_container.dart';
 
-// --- 1. AddPlaceCubit (مدير الحالة) ---
 class AddPlaceCubit extends Cubit<AddPlaceState> {
   AddPlaceCubit() : super(AddPlaceInitial());
 
   final ImagePicker _picker = ImagePicker();
   List<XFile> selectedImages = [];
 
-  // دالة اختيار الصور
   Future<void> pickImages() async {
     final List<XFile>? images = await _picker.pickMultiImage();
     if (images != null && images.isNotEmpty) {
@@ -24,7 +25,6 @@ class AddPlaceCubit extends Cubit<AddPlaceState> {
     }
   }
 
-  // دالة رفع المكان (محاكاة)
   Future<void> submitPlace({
     required String name,
     required String description,
@@ -32,7 +32,6 @@ class AddPlaceCubit extends Cubit<AddPlaceState> {
     required double latitude,
     required double longitude,
   }) async {
-    // تحقق من الحقول الأساسية
     if (name.isEmpty || description.isEmpty || category.isEmpty) {
       emit(AddPlaceError('الرجاء تعبئة جميع الحقول'));
       return;
@@ -43,22 +42,16 @@ class AddPlaceCubit extends Cubit<AddPlaceState> {
     }
 
     emit(AddPlaceLoading());
-
-    // محاكاة طلب الـ API (تأخير 2 ثانية)
     await Future.delayed(const Duration(seconds: 2));
-
-    // محاكاة نجاح العملية
     emit(AddPlaceSuccess());
   }
 
-  // دالة لإعادة ضبط الحالة (بعد النجاح)
   void resetState() {
     selectedImages.clear();
     emit(AddPlaceInitial());
   }
 }
 
-// --- 2. حالات (States) الـ Cubit ---
 abstract class AddPlaceState {}
 
 class AddPlaceInitial extends AddPlaceState {}
@@ -77,7 +70,6 @@ class AddPlaceError extends AddPlaceState {
   AddPlaceError(this.message);
 }
 
-// --- 3. شاشة Add Place (UI) ---
 class AddPlaceScreen extends StatelessWidget {
   const AddPlaceScreen({super.key});
 
@@ -86,17 +78,20 @@ class AddPlaceScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('إضافة مكان جديد'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text('إضافة مكان جديد', style: TextStyle(color: AppColors.textPrimary)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: BlocProvider(create: (context) => AddPlaceCubit(), child: const AddPlaceView()),
     );
   }
 }
 
-// --- 4. الـ View المنفصل (يحتوي على الحقول والأزرار) ---
 class AddPlaceView extends StatefulWidget {
   const AddPlaceView({super.key});
 
@@ -137,172 +132,278 @@ class _AddPlaceViewState extends State<AddPlaceView> {
     return BlocConsumer<AddPlaceCubit, AddPlaceState>(
       listener: (context, state) {
         if (state is AddPlaceSuccess) {
-          // عند النجاح، نظهر رسالة ونرجع للصفحة الرئيسية
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم إضافة المكان بنجاح! 🎉'), backgroundColor: Colors.green),
+            SnackBar(content: const Text('تم إضافة المكان بنجاح! 🎉'), backgroundColor: AppColors.success),
           );
-          // نعيد ضبط الـ Cubit
           context.read<AddPlaceCubit>().resetState();
-          // نرجع للـ Home
           context.go(RoutePaths.home);
         } else if (state is AddPlaceError) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text(state.message), backgroundColor: Colors.red));
+          ).showSnackBar(SnackBar(content: Text(state.message), backgroundColor: AppColors.error));
         }
       },
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                // --- حقل الاسم ---
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'اسم المكان *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.place),
-                  ),
-                  validator: (value) => value?.isEmpty ?? true ? 'الرجاء إدخال اسم المكان' : null,
-                ),
-                const SizedBox(height: 16),
-
-                // --- حقل الوصف ---
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 4,
-                  decoration: const InputDecoration(
-                    labelText: 'الوصف *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.description),
-                  ),
-                  validator: (value) => value?.isEmpty ?? true ? 'الرجاء إدخال وصف للمكان' : null,
-                ),
-                const SizedBox(height: 16),
-
-                // --- قائمة منسدلة (التصنيف) ---
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'التصنيف *',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.category),
-                  ),
-                  value: _selectedCategory,
-                  items: _categories.map((category) {
-                    return DropdownMenuItem(value: category, child: Text(category));
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedCategory = value;
-                    });
-                  },
-                  validator: (value) => value == null ? 'الرجاء اختيار تصنيف للمكان' : null,
-                ),
-                const SizedBox(height: 16),
-
-                // --- حقل خط الطول (Latitude) ---
-                TextFormField(
-                  controller: _latitudeController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'خط الطول (Latitude)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.pin_drop),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // --- حقل خط العرض (Longitude) ---
-                TextFormField(
-                  controller: _longitudeController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'خط العرض (Longitude)',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.pin_drop_outlined),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // --- زر اختيار الصور وعرضها ---
-                BlocBuilder<AddPlaceCubit, AddPlaceState>(
-                  builder: (context, state) {
-                    final cubit = context.read<AddPlaceCubit>();
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: state is AddPlaceLoading ? null : () => cubit.pickImages(),
-                          icon: const Icon(Icons.photo_library),
-                          label: const Text('اختر صوراً من المعرض'),
-                          style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: GlassContainer(
+            blur: 15.0,
+            opacity: 0.15,
+            borderRadius: 24.0,
+            borderColor: AppColors.surface.withOpacity(0.1),
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  GlassContainer(
+                    blur: 5.0,
+                    opacity: 0.1,
+                    borderRadius: 50.0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TextFormField(
+                      controller: _nameController,
+                      style: TextStyle(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        labelText: 'اسم المكان *',
+                        labelStyle: TextStyle(color: AppColors.textSecondary),
+                        floatingLabelStyle: TextStyle(color: AppColors.textPrimary),
+                        hintText: 'أدخل اسم المكان',
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
+                        border: const UnderlineInputBorder(borderSide: BorderSide(color: AppColors.border)),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.border),
                         ),
-                        const SizedBox(height: 8),
-                        if (state is AddPlaceImagesPicked)
-                          SizedBox(
-                            height: 80,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: state.images.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.file(
-                                      File(state.images[index].path),
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        if (state is AddPlaceImagesPicked)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: Text(
-                              'تم اختيار ${state.images.length} صورة',
-                              style: const TextStyle(color: Colors.green),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-
-                // --- زر الحفظ (Submit) ---
-                if (state is AddPlaceLoading)
-                  const Center(child: CircularProgressIndicator())
-                else
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        final lat = double.tryParse(_latitudeController.text) ?? 0.0;
-                        final lng = double.tryParse(_longitudeController.text) ?? 0.0;
-
-                        context.read<AddPlaceCubit>().submitPlace(
-                          name: _nameController.text,
-                          description: _descriptionController.text,
-                          category: _selectedCategory!,
-                          latitude: lat,
-                          longitude: lng,
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        icon: Icon(Icons.place, color: AppColors.textSecondary),
+                      ),
+                      validator: (value) => value?.isEmpty ?? true ? 'الرجاء إدخال اسم المكان' : null,
                     ),
-                    child: const Text('إضافة المكان', style: TextStyle(fontSize: 18)),
                   ),
-              ],
+                  const SizedBox(height: AppSpacing.lg),
+
+                  GlassContainer(
+                    blur: 5.0,
+                    opacity: 0.1,
+                    borderRadius: 50.0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TextFormField(
+                      controller: _descriptionController,
+                      maxLines: 3,
+                      style: TextStyle(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        labelText: 'الوصف *',
+                        labelStyle: TextStyle(color: AppColors.textSecondary),
+                        floatingLabelStyle: TextStyle(color: AppColors.textPrimary),
+                        hintText: 'أدخل وصفاً للمكان',
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
+                        border: const UnderlineInputBorder(borderSide: BorderSide(color: AppColors.border)),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        icon: Icon(Icons.description, color: AppColors.textSecondary),
+                      ),
+                      validator: (value) => value?.isEmpty ?? true ? 'الرجاء إدخال وصف للمكان' : null,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  GlassContainer(
+                    blur: 5.0,
+                    opacity: 0.1,
+                    borderRadius: 50.0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: DropdownButtonFormField<String>(
+                      style: TextStyle(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        labelText: 'التصنيف *',
+                        labelStyle: TextStyle(color: AppColors.textSecondary),
+                        floatingLabelStyle: TextStyle(color: AppColors.textPrimary),
+                        border: InputBorder.none,
+                        icon: Icon(Icons.category, color: AppColors.textSecondary),
+                      ),
+                      value: _selectedCategory,
+                      items: _categories.map((category) {
+                        return DropdownMenuItem(
+                          value: category,
+                          child: Text(category, style: TextStyle(color: AppColors.textPrimary)),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value;
+                        });
+                      },
+                      validator: (value) => value == null ? 'الرجاء اختيار تصنيف للمكان' : null,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  GlassContainer(
+                    blur: 5.0,
+                    opacity: 0.1,
+                    borderRadius: 50.0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TextFormField(
+                      controller: _latitudeController,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        labelText: 'خط الطول (Latitude)',
+                        labelStyle: TextStyle(color: AppColors.textSecondary),
+                        floatingLabelStyle: TextStyle(color: AppColors.textPrimary),
+                        hintText: 'مثال: 36.2153',
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
+                        border: const UnderlineInputBorder(borderSide: BorderSide(color: AppColors.border)),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        icon: Icon(Icons.pin_drop, color: AppColors.textSecondary),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  GlassContainer(
+                    blur: 5.0,
+                    opacity: 0.1,
+                    borderRadius: 50.0,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: TextFormField(
+                      controller: _longitudeController,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        labelText: 'خط العرض (Longitude)',
+                        labelStyle: TextStyle(color: AppColors.textSecondary),
+                        floatingLabelStyle: TextStyle(color: AppColors.textPrimary),
+                        hintText: 'مثال: 37.1653',
+                        hintStyle: TextStyle(color: AppColors.textSecondary),
+                        border: const UnderlineInputBorder(borderSide: BorderSide(color: AppColors.border)),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(color: AppColors.primary),
+                        ),
+                        icon: Icon(Icons.pin_drop_outlined, color: AppColors.textSecondary),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  BlocBuilder<AddPlaceCubit, AddPlaceState>(
+                    builder: (context, state) {
+                      final cubit = context.read<AddPlaceCubit>();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GlassContainer(
+                            blur: 10.0,
+                            opacity: 0.2,
+                            borderRadius: 12.0,
+                            borderColor: AppColors.primary.withOpacity(0.3),
+                            padding: EdgeInsets.zero,
+                            child: MaterialButton(
+                              onPressed: state is AddPlaceLoading ? null : () => cubit.pickImages(),
+                              height: 50,
+                              minWidth: double.infinity,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.photo_library, color: AppColors.textPrimary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'اختر صوراً من المعرض',
+                                    style: TextStyle(color: AppColors.textPrimary),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          if (state is AddPlaceImagesPicked) ...[
+                            SizedBox(
+                              height: 80,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: state.images.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Image.file(
+                                        File(state.images[index].path),
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                'تم اختيار ${state.images.length} صورة',
+                                style: TextStyle(color: AppColors.success, fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+
+                  if (state is AddPlaceLoading)
+                    const Center(child: CircularProgressIndicator(color: AppColors.primary))
+                  else
+                    GlassContainer(
+                      blur: 10.0,
+                      opacity: 0.25,
+                      borderRadius: 12.0,
+                      borderColor: AppColors.primary.withOpacity(0.5),
+                      padding: EdgeInsets.zero,
+                      child: MaterialButton(
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            final lat = double.tryParse(_latitudeController.text) ?? 0.0;
+                            final lng = double.tryParse(_longitudeController.text) ?? 0.0;
+
+                            context.read<AddPlaceCubit>().submitPlace(
+                              name: _nameController.text,
+                              description: _descriptionController.text,
+                              category: _selectedCategory!,
+                              latitude: lat,
+                              longitude: lng,
+                            );
+                          }
+                        },
+                        height: 56,
+                        minWidth: double.infinity,
+                        child: Text(
+                          'إضافة المكان',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );

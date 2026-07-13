@@ -7,17 +7,16 @@ import '../../presentation/splash/screens/splash_screen.dart';
 import '../../presentation/onboarding/screens/onboarding_screen.dart';
 import '../../presentation/navigation/screens/app_shell_screen.dart';
 import '../../presentation/home/screens/home_map_screen.dart';
-import '../../presentation/place/screens/place_details_screen.dart';
 import '../../presentation/place/screens/add_place_screen.dart';
 import '../../presentation/nearby/screens/nearby_places_screen.dart';
 import '../../presentation/trip/screens/trip_suggestion_screen.dart';
+import '../../presentation/place/screens/my_places_screen.dart';
 
 import '../../presentation/auth/screens/login_screen.dart';
 import '../../presentation/auth/screens/register_screen.dart';
 import '../../presentation/profile/screens/profile_screen.dart';
 import '../../presentation/favorites/screens/favorites_screen.dart';
 
-// Service مؤقت
 import '../../core/services/auth_service.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -28,7 +27,7 @@ GoRouter createAppRouter() {
     initialLocation: RoutePaths.splash,
     redirect: (context, state) {
       if (state.matchedLocation == RoutePaths.splash) {
-        return RoutePaths.addPlace; // يودي لشاشة الإضافة
+        return RoutePaths.login;
       }
 
       if (state.matchedLocation == RoutePaths.home && !AuthService.isLoggedIn) {
@@ -60,7 +59,17 @@ GoRouter createAppRouter() {
           },
         ),
       ),
-
+      GoRoute(
+        path: RoutePaths.myPlaces,
+        name: RouteNames.myPlaces,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const MyPlacesScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
       GoRoute(
         path: RoutePaths.login,
         name: RouteNames.login,
