@@ -1,3 +1,4 @@
+import 'package:app_aq_2/presentation/filter/screens/filter_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'route_names.dart';
@@ -86,9 +87,10 @@ GoRouter createAppRouter() {
                 pageBuilder: (context, state) => CustomTransitionPage<void>(
                   key: state.pageKey,
                   child: const HomeMapScreen(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                 ),
               ),
             ],
@@ -101,9 +103,10 @@ GoRouter createAppRouter() {
                 pageBuilder: (context, state) => CustomTransitionPage<void>(
                   key: state.pageKey,
                   child: const SearchScreen(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                 ),
               ),
             ],
@@ -116,9 +119,10 @@ GoRouter createAppRouter() {
                 pageBuilder: (context, state) => CustomTransitionPage<void>(
                   key: state.pageKey,
                   child: const FavoritesScreen(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                 ),
               ),
             ],
@@ -131,9 +135,10 @@ GoRouter createAppRouter() {
                 pageBuilder: (context, state) => CustomTransitionPage<void>(
                   key: state.pageKey,
                   child: const ProfileScreen(),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                 ),
               ),
             ],
@@ -148,15 +153,16 @@ GoRouter createAppRouter() {
           return CustomTransitionPage<void>(
             key: state.pageKey,
             child: PlaceDetailsScreen(placeId: placeId),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, 1),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              );
-            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 1),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
           );
         },
       ),
@@ -180,13 +186,19 @@ GoRouter createAppRouter() {
       GoRoute(
         path: RoutePaths.nearbyPlaces,
         name: RouteNames.nearbyPlaces,
-        pageBuilder: (context, state) => CustomTransitionPage<void>(
-          key: state.pageKey,
-          child: const NearbyPlacesScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
+        pageBuilder: (context, state) {
+          final userCords = (state.extra as Map<String, dynamic>)["userCords"];
+          final placeIds = (state.extra as Map<String, dynamic>)["placeIds"];
+
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: NearbyPlacesScreen(placeIds: placeIds, userCords: userCords),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+          );
+        },
       ),
       GoRoute(
         path: RoutePaths.tripSuggestion,
@@ -194,6 +206,17 @@ GoRouter createAppRouter() {
         pageBuilder: (context, state) => CustomTransitionPage<void>(
           key: state.pageKey,
           child: const TripSuggestionScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.filter,
+        name: RouteNames.filter,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const FilterScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },

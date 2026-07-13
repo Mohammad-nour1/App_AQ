@@ -1,5 +1,7 @@
+import 'package:app_aq_2/core/utils/location_handler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:location/location.dart';
 import '../../../core/models/place.dart';
 import '../../../core/models/place_categories.dart';
 import '../../../core/repository/favorites_repository.dart';
@@ -27,32 +29,18 @@ class HomeCubit extends Cubit<HomeCubitState> {
         filteredPlaces: placesList,
         cities: cityList,
         favoritesIndecies: favoritesList,
-        nearbyPlaces: [],
+        nearbyPlacesIds: [],
       ),
     );
   }
 
-  void applyFilter() {
+  void resetFilterCenter() {
     if (state is HomeLoaded) {
-      final curr = state as HomeLoaded;
-      if (curr.filterMode == 'city') {
-        _filter(
-          city: curr.selectedCity,
-          categories: curr.selectedCategories,
-          minRating: curr.minRating,
-        );
-      } else {
-        _filterByNearPlaces(
-          userCords: curr.userLocation,
-          maxKilos: curr.maxDistanceKm,
-          categories: curr.selectedCategories,
-          rate: curr.minRating,
-        );
-      }
+      emit((state as HomeLoaded).copyWith(moveToFilter: false));
     }
   }
 
-  void _filter({
+  void filter({
     String? city,
     Set<PlaceCategories>? categories,
     int? minRating,
@@ -74,16 +62,17 @@ class HomeCubit extends Cubit<HomeCubitState> {
           selectedCategories: categories,
           minRating: minRating,
           filteredPlaces: filteredList ?? [],
+          moveToFilter: true,
         ),
       );
     }
   }
 
-  void _filterByNearPlaces({
+  void filterByNearPlaces({
     required LatLng? userCords,
     required double maxKilos,
     Set<PlaceCategories> categories = const {},
-    int rate = 1,
+    int minRating = 1,
   }) {
     if (state is HomeLoaded && userCords != null) {
       final current = state as HomeLoaded;
@@ -91,14 +80,15 @@ class HomeCubit extends Cubit<HomeCubitState> {
         userCords,
         maxKilos,
         categories,
-        rate,
+        minRating,
       );
+
       emit(
         current.copyWith(
-          nearbyPlaces: nearby,
+          selectedCategories: categories,
+          minRating: minRating,
+          nearbyPlacesIds: nearby!.map((place) => place.id).toList(),
           moveToNearby: true,
-          // Optionally keep the map's filteredPlaces unchanged?
-          // Usually you'd leave the map as it was, but you can also set filteredPlaces to nearby.
         ),
       );
     }
@@ -113,8 +103,20 @@ class HomeCubit extends Cubit<HomeCubitState> {
 
   void resetMap() {
     if (state is HomeLoaded) {
-      final curr = (state as HomeLoaded);
-      emit(curr.copyWith(places: curr.places, filteredPlaces: curr.places));
+      final curr = state as HomeLoaded;
+      emit(
+        curr.copyWith(
+          filterMode: 'city',
+          selectedCity: 'Damascus',
+          selectedCategories: {},
+          minRating: 1,
+          maxDistanceKm: 10,
+          userLocation: null,
+          isFetchingLocation: false,
+          filteredPlaces: curr.places,
+          moveToFilter: true,
+        ),
+      );
     }
   }
 
@@ -158,15 +160,21 @@ class HomeCubit extends Cubit<HomeCubitState> {
         : state,
   );
 
-  //  Future<void> _fetchUserLocation() async {
-  //     setState(() => _isFetchingLocation = true);
-  //     final loc = await getUserLocation();
-  //     if (!mounted) return;
-  //     setState(() {
-  //       if (loc != null) {
-  //         _userLocation = LatLng(loc.latitude!, loc.longitude!);
-  //       }
-  //       _isFetchingLocation = false;
-  //     });
-  //   }
+  Future<void> fetchUserLocation() async {
+    if (state is HomeLoaded) {
+      final curr = (state as HomeLoaded);
+      if (curr.userLocation != null) return;
+      emit(curr.copyWith(isFetchingLocation: true));
+      final LocationData? userLoc = await getUserLocation();
+
+      if (!isClosed) {
+        final newLocation = userLoc != null
+            ? LatLng(userLoc.latitude!, userLoc.longitude!)
+            : null;
+        emit(
+          curr.copyWith(userLocation: newLocation, isFetchingLocation: false),
+        );
+      }
+    }
+  }
 }

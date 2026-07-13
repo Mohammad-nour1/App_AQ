@@ -14,6 +14,7 @@ FlutterMap mapBuilder({
     options: MapOptions(
       initialCenter: LatLng(focusCords.latitude, focusCords.longitude),
       initialZoom: initZoomLevel,
+      minZoom: 6.0,
     ),
     children: [
       TileLayer(

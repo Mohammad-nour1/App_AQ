@@ -3,7 +3,7 @@ import 'package:app_aq_2/core/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_scalify/responsive_scale/responsive_extensions.dart';
 
-import '../../../../../core/models/place.dart';
+import '../../models/place.dart';
 
 itemBuilder(Place place, VoidCallback setDestination) {
   return Card(

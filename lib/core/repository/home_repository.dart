@@ -4,6 +4,7 @@ abstract class HomeRepository {
   //
   List<Place> getAllPlaces();
   List<String> getCities();
+
   //
   Place getPlaceById(String id);
   List<Place> getPlacesByIds(List<String> ids);

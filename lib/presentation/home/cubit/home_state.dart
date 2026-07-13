@@ -28,16 +28,18 @@ class HomeLoaded extends HomeCubitState {
   final String? selectedCity;
   final List<Place> filteredPlaces;
   final LatLng? userLocation;
+  final bool moveToFilter;
   // --
   final double maxDistanceKm;
-  final List<Place> nearbyPlaces;
+  final List<String> nearbyPlacesIds;
   final bool moveToNearby;
+  final bool isFetchingLocation;
   //  ------
   final List<String> favoritesIndecies;
 
   HomeLoaded({
     required this.filteredPlaces,
-    required this.nearbyPlaces,
+    required this.nearbyPlacesIds,
     required this.cities,
     required this.places,
     required this.favoritesIndecies,
@@ -48,12 +50,14 @@ class HomeLoaded extends HomeCubitState {
     this.selectedCategories = const {},
     this.minRating = 1,
     this.moveToNearby = false,
+    this.moveToFilter = false,
+    this.isFetchingLocation = false,
   });
 
   HomeLoaded copyWith({
     List<Place>? places,
     List<Place>? filteredPlaces,
-    List<Place>? nearbyPlaces,
+    List<String>? nearbyPlacesIds,
     List<String>? favoritesIndecies,
     String? selectedCity,
     String? filterMode,
@@ -63,6 +67,8 @@ class HomeLoaded extends HomeCubitState {
     double? maxDistanceKm,
     LatLng? userLocation,
     bool? moveToNearby,
+    bool? moveToFilter,
+    bool? isFetchingLocation,
   }) {
     return HomeLoaded(
       filteredPlaces: filteredPlaces ?? this.filteredPlaces,
@@ -72,11 +78,13 @@ class HomeLoaded extends HomeCubitState {
       selectedCategories: selectedCategories ?? this.selectedCategories,
       minRating: minRating ?? this.minRating,
       selectedCity: selectedCity ?? this.selectedCity,
-      nearbyPlaces: nearbyPlaces ?? this.nearbyPlaces,
+      nearbyPlacesIds: nearbyPlacesIds ?? this.nearbyPlacesIds,
       moveToNearby: moveToNearby ?? this.moveToNearby,
       filterMode: filterMode ?? this.filterMode,
       maxDistanceKm: maxDistanceKm ?? this.maxDistanceKm,
       userLocation: userLocation ?? this.userLocation,
+      isFetchingLocation: isFetchingLocation ?? this.isFetchingLocation,
+      moveToFilter: moveToFilter ?? this.moveToFilter,
     );
   }
 
@@ -90,9 +98,11 @@ class HomeLoaded extends HomeCubitState {
     filteredPlaces,
     selectedCategories,
     moveToNearby,
-    nearbyPlaces,
+    nearbyPlacesIds,
     userLocation,
     maxDistanceKm,
     filterMode,
+    isFetchingLocation,
+    moveToFilter,
   ];
 }

@@ -4,18 +4,14 @@ import 'package:app_aq_2/core/models/place.dart';
 import 'package:app_aq_2/core/theme/theme.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_cubit.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_state.dart';
-
-import 'package:app_aq_2/presentation/home/screens/widgets/back_button.dart';
 import 'package:app_aq_2/presentation/home/screens/widgets/favorite_button.dart';
-import 'package:app_aq_2/presentation/home/screens/widgets/map_builder.dart';
+import 'package:app_aq_2/core/widgets/map_builder.dart';
+import 'package:app_aq_2/core/widgets/markers_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_scalify/responsive_scale/responsive_extensions.dart';
 import 'package:latlong2/latlong.dart';
-
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_spacing.dart';
 import '../../../core/di/injector.dart';
 
 import '../../../core/repository/home_repository.dart';
@@ -119,16 +115,16 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           if (routeInfo != null) ...[
-            if (routeInfo!.distance != 0.0) ...[
+            if (routeInfo.distance != 0.0) ...[
               SizedBox(height: 15.h),
               Text(
-                '🛣️ Distance: ${(routeInfo!.distance / 1000).toStringAsFixed(1)} km',
+                '🛣️ Distance: ${(routeInfo.distance / 1000).toStringAsFixed(1)} km',
               ),
             ],
-            if (routeInfo!.duration != 0.0) ...[
+            if (routeInfo.duration != 0.0) ...[
               SizedBox(height: 15.h),
               Text(
-                '⏱️ Estimated time: ${(routeInfo!.duration / 60).toStringAsFixed(0)} min',
+                '⏱️ Estimated time: ${(routeInfo.duration / 60).toStringAsFixed(0)} min',
               ),
             ],
           ],
@@ -191,14 +187,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       mapController: mapController,
       markerLayerBuilder: () => MarkerLayer(
         markers: [
-          Marker(
-            point: LatLng(latitude, longitude),
-            child: Icon(Icons.location_on, color: Colors.blue),
-          ),
+          MarkersBuilder.locationMarker(LatLng(latitude, longitude)),
           if (userLocation != null)
-            Marker(
-              point: LatLng(userLocation!.latitude!, userLocation!.longitude!),
-              child: Icon(Icons.my_location, color: Colors.green),
+            MarkersBuilder.userMarker(
+              LatLng(userLocation!.latitude!, userLocation!.longitude!),
             ),
         ],
       ),
