@@ -38,6 +38,11 @@ dependencies:
   go_router: ^17.0.0
   shared_preferences: ^2.5.3
   flutter_bloc: ^9.1.1
+  flutter_map: ^8.3.1
+  equatable: 
+  location: 
+  flutter_scalify:  
+  latlong2: 
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +71,19 @@ flutter:
   - assets/images/umayyad_mosque.jpg
   - assets/images/syria_place2.jpg
   - assets/images/syria_place3.jpg
+  - assets/images/aleppo.jpg
+  - assets/images/hama.jpg
+  - assets/images/omawi_main.jpg
+  - assets/images/omawi1.jpg
+  - assets/images/omawi2.jpg
+  - assets/images/omawi3.jpg
+  - assets/images/omawi4.jpg
+  - assets/images/omawi5.jpg
+  - assets/images/omawi6.jpg
+  - assets/images/souq.jpg
+
+
+    
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

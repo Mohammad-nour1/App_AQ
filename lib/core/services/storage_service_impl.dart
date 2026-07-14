@@ -55,4 +55,14 @@ class StorageServiceImpl implements StorageService {
   Future<void> clear() async {
     await _preferences.clear();
   }
+
+  @override
+  Future<bool> saveList(key, list) async {
+    return await _preferences.setStringList(key, list);
+  }
+
+  @override
+  List<String>? getList(key) {
+    return _preferences.getStringList(key);
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:app_aq_2/core/services/auth_service.dart';
 import 'package:app_aq_2/presentation/favorites/screens/favorites_screen.dart';
+import 'package:app_aq_2/presentation/filter/screens/filter_screen.dart';
 import 'package:app_aq_2/presentation/home/screens/home_map_screen.dart';
 import 'package:app_aq_2/presentation/nearby/screens/nearby_places_screen.dart';
 import 'package:app_aq_2/presentation/place/screens/add_place_screen.dart';
@@ -159,13 +160,19 @@ GoRouter createAppRouter() {
       GoRoute(
         path: RoutePaths.nearbyPlaces,
         name: RouteNames.nearbyPlaces,
-        pageBuilder: (context, state) => CustomTransitionPage<void>(
-          key: state.pageKey,
-          child: const NearbyPlacesScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
+        pageBuilder: (context, state) {
+          final userCords = (state.extra as Map<String, dynamic>)["userCords"];
+          final placeIds = (state.extra as Map<String, dynamic>)["placeIds"];
+
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: NearbyPlacesScreen(placeIds: placeIds, userCords: userCords),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+          );
+        },
       ),
       GoRoute(
         path: RoutePaths.tripSuggestion,
@@ -173,6 +180,17 @@ GoRouter createAppRouter() {
         pageBuilder: (context, state) => CustomTransitionPage<void>(
           key: state.pageKey,
           child: const TripSuggestionScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
+      GoRoute(
+        path: RoutePaths.filter,
+        name: RouteNames.filter,
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const FilterScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(opacity: animation, child: child);
           },
