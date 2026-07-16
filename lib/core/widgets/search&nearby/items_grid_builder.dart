@@ -2,7 +2,7 @@ import 'package:app_aq_2/core/widgets/search&nearby/grid_item_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../models/place.dart';
+import '../../models/place/place.dart';
 
 GridView itemsGridBuilder(
   double spacing,

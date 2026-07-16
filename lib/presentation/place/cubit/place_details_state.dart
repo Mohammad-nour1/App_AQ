@@ -1,9 +1,9 @@
-import 'package:app_aq_2/core/models/route_info.dart';
+import 'package:app_aq_2/core/models/map/route_info.dart';
 import 'package:equatable/equatable.dart';
 import 'package:location/location.dart';
 
 import '../../../core/error/failures.dart';
-import '../../../core/models/place.dart';
+import '../../../core/models/place/place.dart';
 
 abstract class PlaceDetailState extends Equatable {}
 

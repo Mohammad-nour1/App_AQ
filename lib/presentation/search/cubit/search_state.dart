@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../core/models/place.dart';
+import '../../../core/models/place/place.dart';
 
 sealed class SearchState extends Equatable {}
 

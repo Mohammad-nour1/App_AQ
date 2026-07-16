@@ -1,3 +1,4 @@
+import 'package:app_aq_2/core/models/trip/trip_suggestion.dart';
 import 'package:app_aq_2/presentation/filter/screens/filter_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -203,13 +204,16 @@ GoRouter createAppRouter() {
       GoRoute(
         path: RoutePaths.tripSuggestion,
         name: RouteNames.tripSuggestion,
-        pageBuilder: (context, state) => CustomTransitionPage<void>(
-          key: state.pageKey,
-          child: const TripSuggestionScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        ),
+        pageBuilder: (context, state) {
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: TripSuggestionScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+          );
+        },
       ),
       GoRoute(
         path: RoutePaths.filter,

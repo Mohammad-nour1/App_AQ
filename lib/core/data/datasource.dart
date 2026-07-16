@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../models/place.dart';
-import '../models/place_categories.dart';
-import '../models/place_location.dart';
+import '../models/place/place.dart';
+import '../models/place/place_categories.dart';
+import '../models/place/place_location.dart';
 
 List<Place> getPlaces() => [
   // ===== Damascus =====
@@ -60,6 +60,121 @@ List<Place> getPlaces() => [
     images: List.generate(8, (i) => "assets/images/d3_${i + 1}.jpg"),
     description:
         "A scenic mountain overlooking Damascus, offering panoramic views of the city. A popular spot for locals and visitors, especially at sunset.",
+  ),
+  Place(
+    id: "d4",
+    name: "قصر العظم",
+    city: "Damascus",
+    category: PlaceCategories.HistoricalPlaces,
+    rating: 4.6,
+    location: PlaceLocation(
+      address: "قصر العظم، البزورية، دمشق",
+      latitude: 33.5100,
+      longitude: 36.3068,
+    ),
+    image: "assets/images/azm_palace_main.jpg",
+    images: [
+      "assets/images/azm1.jpg",
+      "assets/images/azm2.jpg",
+      "assets/images/azm3.jpg",
+      "assets/images/azm4.jpg",
+      "assets/images/azm5.jpg",
+      "assets/images/azm6.jpg",
+    ],
+    description:
+        "A stunning 18th-century Ottoman palace, now a museum of arts and popular traditions. Its intricate woodwork, mosaic panels, and tranquil courtyards offer a glimpse into Damascene aristocratic life.",
+  ),
+  Place(
+    id: "d5",
+    name: "متحف دمشق الوطني",
+    city: "Damascus",
+    category: PlaceCategories.HistoricalPlaces,
+    rating: 4.5,
+    location: PlaceLocation(
+      address: "متحف دمشق الوطني، شارع شكري القوتلي، دمشق",
+      latitude: 33.5126,
+      longitude: 36.2900,
+    ),
+    image: "assets/images/national_museum_main.jpg",
+    images: [
+      "assets/images/museum1.jpg",
+      "assets/images/museum2.jpg",
+      "assets/images/museum3.jpg",
+      "assets/images/museum4.jpg",
+      "assets/images/museum5.jpg",
+      "assets/images/museum6.jpg",
+    ],
+    description:
+        "Home to an extraordinary collection of artifacts spanning Syria's 11,000-year history, including the Dura-Europos synagogue frescoes and the Ugaritic alphabet tablets.",
+  ),
+  Place(
+    id: "d6",
+    name: "ساحة المرجة",
+    city: "Damascus",
+    category: PlaceCategories.HistoricalPlaces,
+    rating: 4.2,
+    location: PlaceLocation(
+      address: "ساحة المرجة، دمشق",
+      latitude: 33.5132,
+      longitude: 36.2963,
+    ),
+    image: "assets/images/marjeh_main.jpg",
+    images: [
+      "assets/images/marjeh1.jpg",
+      "assets/images/marjeh2.jpg",
+      "assets/images/marjeh3.jpg",
+      "assets/images/marjeh4.jpg",
+      "assets/images/marjeh5.jpg",
+      "assets/images/marjeh6.jpg",
+    ],
+    description:
+        "A historic square in central Damascus, known for its iconic Ottoman clock tower and the surrounding colonial-era buildings. It is a lively crossroads of commerce and daily life.",
+  ),
+  Place(
+    id: "d7",
+    name: "باب شرقي",
+    city: "Damascus",
+    category: PlaceCategories.HistoricalPlaces,
+    rating: 4.4,
+    location: PlaceLocation(
+      address: "باب شرقي، دمشق",
+      latitude: 33.5090,
+      longitude: 36.3172,
+    ),
+    image: "assets/images/bab_sharqi_main.jpg",
+    images: [
+      "assets/images/bab_sharqi1.jpg",
+      "assets/images/bab_sharqi2.jpg",
+      "assets/images/bab_sharqi3.jpg",
+      "assets/images/bab_sharqi4.jpg",
+      "assets/images/bab_sharqi5.jpg",
+      "assets/images/bab_sharqi6.jpg",
+    ],
+    description:
+        "The Eastern Gate of the old city of Damascus, one of the original Roman gates still standing. It opens into the historic Straight Street and is surrounded by vibrant souks.",
+  ),
+  Place(
+    id: "d8",
+    name: "مجمع الصالحية",
+    city: "Damascus",
+    category: PlaceCategories.ReligionistPlaces,
+    rating: 4.3,
+    location: PlaceLocation(
+      address: "مجمع الصالحية، جبل قاسيون، دمشق",
+      latitude: 33.5275,
+      longitude: 36.2875,
+    ),
+    image: "assets/images/salihiya_main.jpg",
+    images: [
+      "assets/images/salihiya1.jpg",
+      "assets/images/salihiya2.jpg",
+      "assets/images/salihiya3.jpg",
+      "assets/images/salihiya4.jpg",
+      "assets/images/salihiya5.jpg",
+      "assets/images/salihiya6.jpg",
+    ],
+    description:
+        "A historic religious complex on the slopes of Mount Qasioun, containing several mosques, madrasas, and the tomb of Sheikh Muhyiddin Ibn Arabi, a renowned Sufi mystic.",
   ),
 
   // ===== Aleppo =====

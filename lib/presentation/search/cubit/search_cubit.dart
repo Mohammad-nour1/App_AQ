@@ -4,7 +4,7 @@ import 'package:app_aq_2/presentation/search/cubit/search_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../core/models/place.dart';
+import '../../../core/models/place/place.dart';
 import '../../../core/repository/home_repository.dart';
 
 class SearchCubit extends Cubit<SearchState> {

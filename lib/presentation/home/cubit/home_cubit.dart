@@ -1,9 +1,11 @@
+import 'package:app_aq_2/core/error/exceptions.dart';
 import 'package:app_aq_2/core/utils/location_handler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import '../../../core/models/place.dart';
-import '../../../core/models/place_categories.dart';
+import '../../../core/error/failures.dart';
+import '../../../core/models/place/place.dart';
+import '../../../core/models/place/place_categories.dart';
 import '../../../core/repository/favorites_repository.dart';
 import '../../../core/repository/home_repository.dart';
 import 'home_state.dart';
@@ -17,21 +19,37 @@ class HomeCubit extends Cubit<HomeCubitState> {
 
   Future<void> load() async {
     emit(HomeLoading());
-    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      await Future.delayed(const Duration(milliseconds: 500));
 
-    final placesList = _homeRepository.getAllPlaces();
-    final cityList = _homeRepository.getCities();
-    final favoritesList = _favoritesRepository.getFavoritesList();
+      final placesList = _homeRepository.getAllPlaces();
+      final cityList = _homeRepository.getCities();
+      final favoritesList = _favoritesRepository.getFavoritesList();
 
-    emit(
-      HomeLoaded(
-        places: placesList,
-        filteredPlaces: placesList,
-        cities: cityList,
-        favoritesIndecies: favoritesList,
-        nearbyPlacesIds: [],
-      ),
-    );
+      emit(
+        HomeLoaded(
+          places: placesList,
+          filteredPlaces: placesList,
+          cities: cityList,
+          favoritesIndecies: favoritesList,
+          nearbyPlacesIds: [],
+        ),
+      );
+    } on AppException catch (e) {
+      if (e is NetworkException) {
+        emit(HomeError(NetworkFailure(code: e.code, message: e.message)));
+      } else if (e is CacheException) {
+        emit(HomeError(CacheFailure(code: e.code, message: e.message)));
+      } else if (e is ValidationException) {
+        emit(HomeError(ValidationFailure(code: e.code, message: e.message)));
+      } else {
+        emit(HomeError(UnknownFailure(code: e.code, message: e.message)));
+      }
+    } catch (e) {
+      emit(
+        HomeError(UnknownFailure(code: 'unknown-error', message: e.toString())),
+      );
+    }
   }
 
   void resetFilterCenter() {

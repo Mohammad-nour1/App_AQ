@@ -9,7 +9,7 @@ import 'package:app_aq_2/core/theme/theme.dart';
 import 'package:app_aq_2/core/widgets/loading_indicator.dart';
 import 'package:app_aq_2/core/widgets/error_view.dart';
 import 'package:app_aq_2/core/data/datasource.dart';
-import 'package:app_aq_2/core/models/place.dart';
+import 'package:app_aq_2/core/models/place/place.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_cubit.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_state.dart';
 import 'package:app_aq_2/core/widgets/map_builder.dart';
@@ -44,6 +44,11 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
           IconButton(
             onPressed: () => GoRouter.of(context).push(RoutePaths.search),
             icon: const Icon(Icons.search),
+          ),
+          IconButton(
+            onPressed: () =>
+                GoRouter.of(context).push(RoutePaths.tripSuggestion),
+            icon: const Icon(Icons.explore),
           ),
         ],
       ),
@@ -128,8 +133,14 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
               ],
             );
           }
-
-          return ErrorView(message: "Something went wrong", onRetry: () {});
+          if (state is HomeError) {
+            final failure = state.errorFaliure;
+            return ErrorView(
+              message: failure.message,
+              onRetry: () => context.read<HomeCubit>().load(),
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
       floatingActionButton: FloatingActionButton(

@@ -1,6 +1,6 @@
 import 'package:app_aq_2/core/constants/app_colors.dart';
 import 'package:app_aq_2/core/constants/app_radius.dart';
-import 'package:app_aq_2/core/models/place_categories.dart';
+import 'package:app_aq_2/core/models/place/place_categories.dart';
 import 'package:app_aq_2/core/router/router.dart';
 import 'package:app_aq_2/core/theme/theme.dart';
 import 'package:app_aq_2/core/widgets/error_view.dart';
