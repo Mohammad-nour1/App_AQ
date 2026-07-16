@@ -10,6 +10,7 @@ final _appRouter = createAppRouter();
 class App extends StatelessWidget {
   const App({super.key});
 
+  @override
   Widget build(BuildContext context) {
     return BlocProvider<HomeCubit>(
       create: (context) => HomeCubit(getIt(), getIt())..load(),

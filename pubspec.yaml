@@ -39,10 +39,11 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_bloc: ^9.1.1
   flutter_map: ^8.3.1
-  equatable: 
-  location: 
-  flutter_scalify:  
-  latlong2: 
+  equatable: ^2.0.5
+  location: ^7.0.1
+  flutter_scalify: ^2.0.0
+  latlong2: ^0.9.1
+  http: ^1.2.2 
 
 dev_dependencies:
   flutter_test:

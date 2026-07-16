@@ -1,3 +1,4 @@
+import 'package:app_aq_2/core/error/failures.dart';
 import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -37,9 +38,9 @@ class SearchLoaded extends SearchState {
 }
 
 class SearchError extends SearchState {
-  final String message;
-  SearchError(this.message);
+  final Failure failure;
+  SearchError(this.failure);
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [failure];
 }

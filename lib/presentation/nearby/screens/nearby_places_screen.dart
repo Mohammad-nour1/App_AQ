@@ -65,7 +65,7 @@ class _NearbyPlacesScreenState extends State<NearbyPlacesScreen> {
             if (state is NearbyError) {
               return Center(
                 child: Text(
-                  state.message,
+                  state.failure.message,
                   style: const TextStyle(color: AppColors.error),
                 ),
               );
@@ -82,7 +82,7 @@ class _NearbyPlacesScreenState extends State<NearbyPlacesScreen> {
               final availableHeight =
                   screenHeight - bottomPadding - navBarHeight;
 
-              return Padding(
+              return SingleChildScrollView(
                 padding: const EdgeInsets.all(AppSpacing.sm),
                 child: Column(
                   children: [
@@ -127,28 +127,30 @@ class _NearbyPlacesScreenState extends State<NearbyPlacesScreen> {
                         padding: EdgeInsets.symmetric(vertical: 8.0),
                         child: LinearProgressIndicator(),
                       ),
-                    Expanded(
-                      child: itemsGridBuilder(
-                        10.0,
-                        places,
-                        context,
-                        showOnMap: (location) {
-                          final prevDest = (_cubit.state is NearbyLoaded)
-                              ? (_cubit.state as NearbyLoaded).destination
-                              : null;
+                    itemsGridBuilder(
+                      10.0,
+                      places,
+                      context,
+                      onShowOnMap: (place) {
+                        final location = LatLng(
+                          place.location.latitude,
+                          place.location.longitude,
+                        );
+                        final prevDest = (_cubit.state is NearbyLoaded)
+                            ? (_cubit.state as NearbyLoaded).destination
+                            : null;
 
-                          _cubit.setDestination(location);
+                        _cubit.setDestination(location);
 
-                          if (prevDest != null) {
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              mapController.move(
-                                getMiddleCords(widget.userCords, location),
-                                12.0,
-                              );
-                            });
-                          }
-                        },
-                      ),
+                        if (prevDest != null) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            mapController.move(
+                              getMiddleCords(widget.userCords, location),
+                              12.0,
+                            );
+                          });
+                        }
+                      },
                     ),
                   ],
                 ),

@@ -105,8 +105,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                         colors: [
                           Colors.transparent,
-                          AppColors.background
-                              .withOpacity(0.95),
+                          AppColors.background.withValues(alpha: 0.95),
                         ],
                       ), ), ),
                 ]
@@ -223,8 +222,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                                   :
 
-                              AppColors.white
-                                  .withOpacity(0.4),
+                              AppColors.white.withValues(alpha: 0.4),
 
                               borderRadius:
                               BorderRadius.circular(

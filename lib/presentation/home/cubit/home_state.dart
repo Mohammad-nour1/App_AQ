@@ -17,6 +17,7 @@ class HomeLoading extends HomeCubitState {
 }
 
 class HomeLoaded extends HomeCubitState {
+  static const Object _noChange = Object();
   //
   final List<Place> places;
   final List<String> cities;
@@ -36,6 +37,8 @@ class HomeLoaded extends HomeCubitState {
   final bool isFetchingLocation;
   //  ------
   final List<String> favoritesIndecies;
+  // pending target from other screens
+  final String? pendingTargetPlaceId;
 
   HomeLoaded({
     required this.filteredPlaces,
@@ -52,6 +55,7 @@ class HomeLoaded extends HomeCubitState {
     this.moveToNearby = false,
     this.moveToFilter = false,
     this.isFetchingLocation = false,
+    this.pendingTargetPlaceId,
   });
 
   HomeLoaded copyWith({
@@ -69,6 +73,7 @@ class HomeLoaded extends HomeCubitState {
     bool? moveToNearby,
     bool? moveToFilter,
     bool? isFetchingLocation,
+    Object? pendingTargetPlaceId = _noChange,
   }) {
     return HomeLoaded(
       filteredPlaces: filteredPlaces ?? this.filteredPlaces,
@@ -85,6 +90,9 @@ class HomeLoaded extends HomeCubitState {
       userLocation: userLocation ?? this.userLocation,
       isFetchingLocation: isFetchingLocation ?? this.isFetchingLocation,
       moveToFilter: moveToFilter ?? this.moveToFilter,
+      pendingTargetPlaceId: identical(pendingTargetPlaceId, _noChange)
+          ? this.pendingTargetPlaceId
+          : pendingTargetPlaceId as String?,
     );
   }
 
@@ -104,5 +112,6 @@ class HomeLoaded extends HomeCubitState {
     filterMode,
     isFetchingLocation,
     moveToFilter,
+    pendingTargetPlaceId,
   ];
 }

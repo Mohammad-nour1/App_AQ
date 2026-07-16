@@ -1,7 +1,7 @@
-import 'package:location/location.dart';
 import 'dart:convert';
 
 import 'package:app_aq_2/core/constants/keys.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
@@ -44,7 +44,7 @@ Future<RouteInfo?> getRoute(LatLng? source, LatLng destination) async {
     );
   } else {
     // Handle errors
-    print('Failed to fetch route');
+    debugPrint('Failed to fetch route');
   }
   return null;
 }

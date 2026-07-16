@@ -1,27 +1,32 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_radius.dart';
+import '../../core/constants/app_spacing.dart';
 import '../../core/router/route_paths.dart';
 import '../../core/services/auth_service.dart';
 
 class LoginCubit extends Cubit<String?> {
   LoginCubit() : super(null);
 
-  void login(String email, String password) {
+  static const loadingState = '__loading__';
+
+  Future<void> login(String email, String password) async {
     if (email.isEmpty || password.isEmpty) {
-      emit('الرجاء تعبئة جميع الحقول');
+      emit('Please fill in all fields');
       return;
     }
-    emit('جاري تسجيل الدخول...');
+    emit(loadingState);
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (email == 'test@test.com' && password == '123456') {
-        emit('success');
-      } else {
-        emit('البريد أو كلمة السر غير صحيحة');
-      }
-    });
+    final success = await AuthService.login(email, password);
+    if (success) {
+      emit('success');
+    } else {
+      emit('Invalid email or password');
+    }
   }
 
   void resetState() {
@@ -35,96 +40,305 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: BlocProvider(create: (context) => LoginCubit(), child: const LoginView()),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset('assets/images/splash.jpg', fit: BoxFit.cover),
+          Container(
+            color: AppColors.overlayDark.withValues(alpha: AppOpacity.high),
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+            child: Container(color: AppColors.transparent),
+          ),
+          SafeArea(
+            child: BlocProvider(
+              create: (context) => LoginCubit(),
+              child: const LoginView(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+  State<LoginView> createState() => _LoginViewState();
+}
 
+class _LoginViewState extends State<LoginView> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  bool showPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AuthService.getSavedEmail().then((savedEmail) {
+      if (savedEmail != null && mounted) {
+        emailController.text = savedEmail;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: AppColors.textSecondary),
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+      floatingLabelStyle: const TextStyle(color: AppColors.accent),
+      prefixIcon: Icon(icon, color: AppColors.accent),
+      filled: true,
+      fillColor: AppColors.surface.withValues(alpha: 0.24),
+      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.35)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.25)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        borderSide: BorderSide(color: AppColors.accent, width: 1.5),
+      ),
+    );
+  }
+
+  bool _validateEmail(String email) {
+    return email.contains('@') && email.contains('.');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocConsumer<LoginCubit, String?>(
       listener: (context, state) {
         if (state == 'success') {
-          AuthService.login();
-
           context.go(RoutePaths.home);
-        } else if (state != null && state != 'جاري تسجيل الدخول...') {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state), backgroundColor: Colors.red));
+        } else if (state != null && state != LoginCubit.loadingState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state), backgroundColor: AppColors.error),
+          );
         }
       },
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Icon(Icons.explore, size: 80, color: AppColors.primary),
-              const SizedBox(height: 20),
-              const Text(
-                'مرحباً بك!',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 40),
+        final isLoading = state == LoginCubit.loadingState;
 
-              TextField(
-                controller: emailController,
-                onChanged: (_) => context.read<LoginCubit>().resetState(),
-                decoration: InputDecoration(
-                  labelText: 'البريد الإلكتروني',
-                  prefixIcon: const Icon(Icons.email),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              TextField(
-                controller: passwordController,
-                onChanged: (_) => context.read<LoginCubit>().resetState(),
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'كلمة السر',
-                  prefixIcon: const Icon(Icons.lock),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              if (state == 'جاري تسجيل الدخول...')
-                const Center(child: CircularProgressIndicator())
-              else
-                ElevatedButton(
-                  onPressed: () {
-                    context.read<LoginCubit>().login(
-                      emailController.text.trim(),
-                      passwordController.text.trim(),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 18),
+                  Container(
+                    height: 92,
+                    width: 92,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [AppColors.accentDeep, AppColors.accent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accent.withValues(alpha: 0.24),
+                          blurRadius: 26,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.explore,
+                      size: 42,
+                      color: AppColors.black,
+                    ),
                   ),
-                  child: const Text('تسجيل الدخول'),
-                ),
-
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  context.go(RoutePaths.register);
-                },
-                child: const Text('ليس لديك حساب؟ سجل الآن'),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Welcome Back',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Sign in to continue exploring the best places on your journey.',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 15,
+                      height: 1.6,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 34),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated.withValues(alpha: 0.95),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      border: Border.all(
+                        color: AppColors.border.withValues(alpha: 0.45),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.16),
+                          blurRadius: 28,
+                          offset: const Offset(0, 14),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 28,
+                    ),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextFormField(
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (_) =>
+                                context.read<LoginCubit>().resetState(),
+                            decoration: _inputDecoration(
+                              label: 'Email',
+                              icon: Icons.email_rounded,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              if (!_validateEmail(value.trim())) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: passwordController,
+                            obscureText: !showPassword,
+                            textInputAction: TextInputAction.done,
+                            onChanged: (_) =>
+                                context.read<LoginCubit>().resetState(),
+                            decoration:
+                                _inputDecoration(
+                                  label: 'Password',
+                                  icon: Icons.lock_rounded,
+                                ).copyWith(
+                                  suffixIcon: IconButton(
+                                    splashRadius: 22,
+                                    icon: Icon(
+                                      showPassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        showPassword = !showPassword;
+                                      });
+                                    },
+                                  ),
+                                ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              if (value.trim().length < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          const Text(
+                            'Your data will never be shared with third parties.',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          if (isLoading)
+                            const Center(child: CircularProgressIndicator())
+                          else
+                            ElevatedButton(
+                              onPressed: () {
+                                if (formKey.currentState?.validate() ?? false) {
+                                  context.read<LoginCubit>().login(
+                                    emailController.text.trim(),
+                                    passwordController.text.trim(),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                backgroundColor: AppColors.accent,
+                                foregroundColor: AppColors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.button,
+                                  ),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: const Text(
+                                'Sign In',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          const SizedBox(height: AppSpacing.md),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Don't have an account?",
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  context.go(RoutePaths.register);
+                                },
+                                child: const Text('Sign Up'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },

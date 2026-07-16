@@ -1,37 +1,54 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_radius.dart';
+import '../../core/constants/app_spacing.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/router/route_paths.dart';
 import 'package:go_router/go_router.dart';
 
-// --- 1. Cubit خاص بالتسجيل ---
 class RegisterCubit extends Cubit<String?> {
   RegisterCubit() : super(null);
 
-  void register(String name, String email, String password, String confirmPassword) {
-    // تحقق من الحقول الفارغة
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      emit('الرجاء تعبئة جميع الحقول');
+  static const loadingState = '__loading__';
+
+  Future<void> register(
+    String name,
+    String email,
+    String password,
+    String confirmPassword,
+  ) async {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      emit('Please fill in all fields');
       return;
     }
-    // تحقق من تطابق كلمة المرور
     if (password != confirmPassword) {
-      emit('كلمة المرور غير متطابقة');
+      emit('Passwords do not match');
       return;
     }
     if (password.length < 6) {
-      emit('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      emit('Password must be at least 6 characters');
       return;
     }
 
-    emit('جاري إنشاء الحساب...');
+    emit(loadingState);
 
-    // محاكاة طلب السيرفر
-    Future.delayed(const Duration(seconds: 2), () {
-      // نفترض إنه تم التسجيل بنجاح
+    final success = await AuthService.register(
+      name: name,
+      email: email,
+      password: password,
+    );
+
+    if (success) {
       emit('success');
-    });
+    } else {
+      emit('Registration failed. Please try again.');
+    }
   }
 
   void resetState() {
@@ -39,134 +56,337 @@ class RegisterCubit extends Cubit<String?> {
   }
 }
 
-// --- 2. شاشة Register ---
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: BlocProvider(create: (context) => RegisterCubit(), child: const RegisterView()),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset('assets/images/splash.jpg', fit: BoxFit.cover),
+          Container(
+            color: AppColors.overlayDark.withValues(alpha: AppOpacity.high),
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+            child: Container(color: AppColors.transparent),
+          ),
+          SafeArea(
+            child: BlocProvider(
+              create: (context) => RegisterCubit(),
+              child: const RegisterView(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// --- 3. الـ View ---
-class RegisterView extends StatelessWidget {
+class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final nameController = TextEditingController();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    final confirmPasswordController = TextEditingController();
+  State<RegisterView> createState() => _RegisterViewState();
+}
 
+class _RegisterViewState extends State<RegisterView> {
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
+  bool showPassword = false;
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  InputDecoration _inputDecoration({
+    required String label,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: AppColors.textSecondary),
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+      floatingLabelStyle: const TextStyle(color: AppColors.accent),
+      prefixIcon: Icon(icon, color: AppColors.accent),
+      filled: true,
+      fillColor: AppColors.surface.withValues(alpha: 0.24),
+      contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.35)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        borderSide: BorderSide(color: AppColors.border.withValues(alpha: 0.25)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadius.input),
+        borderSide: BorderSide(color: AppColors.accent, width: 1.5),
+      ),
+    );
+  }
+
+  bool _validateEmail(String email) {
+    return email.contains('@') && email.contains('.');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocConsumer<RegisterCubit, String?>(
       listener: (context, state) {
         if (state == 'success') {
-          // بعد نجاح التسجيل، نسجل دخوله تلقائياً ونوديه للـ Home
-          AuthService.login();
           context.go(RoutePaths.home);
-        } else if (state != null && state != 'جاري إنشاء الحساب...') {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state), backgroundColor: Colors.red));
+        } else if (state != null && state != RegisterCubit.loadingState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state), backgroundColor: AppColors.error),
+          );
         }
       },
       builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 60),
-                const Icon(Icons.person_add, size: 80, color: AppColors.primary),
-                const SizedBox(height: 20),
-                const Text(
-                  'إنشاء حساب جديد',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40),
+        final isLoading = state == RegisterCubit.loadingState;
 
-                TextField(
-                  controller: nameController,
-                  onChanged: (_) => context.read<RegisterCubit>().resetState(),
-                  decoration: InputDecoration(
-                    labelText: 'الاسم الكامل',
-                    prefixIcon: const Icon(Icons.person),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                TextField(
-                  controller: emailController,
-                  onChanged: (_) => context.read<RegisterCubit>().resetState(),
-                  decoration: InputDecoration(
-                    labelText: 'البريد الإلكتروني',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                TextField(
-                  controller: passwordController,
-                  onChanged: (_) => context.read<RegisterCubit>().resetState(),
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'كلمة السر (6 أحرف على الأقل)',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                TextField(
-                  controller: confirmPasswordController,
-                  onChanged: (_) => context.read<RegisterCubit>().resetState(),
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'تأكيد كلمة السر',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                if (state == 'جاري إنشاء الحساب...')
-                  const Center(child: CircularProgressIndicator())
-                else
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<RegisterCubit>().register(
-                        nameController.text.trim(),
-                        emailController.text.trim(),
-                        passwordController.text.trim(),
-                        confirmPasswordController.text.trim(),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 18),
+                  Container(
+                    height: 92,
+                    width: 92,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [AppColors.accentDeep, AppColors.accent],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accent.withValues(alpha: 0.24),
+                          blurRadius: 26,
+                          offset: const Offset(0, 12),
+                        ),
+                      ],
                     ),
-                    child: const Text('إنشاء الحساب'),
+                    child: const Icon(
+                      Icons.person_add,
+                      size: 42,
+                      color: AppColors.black,
+                    ),
                   ),
-
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    context.go(RoutePaths.login);
-                  },
-                  child: const Text('لديك حساب بالفعل؟ سجل دخول'),
-                ),
-                const SizedBox(height: 30),
-              ],
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Create Account',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Create your account and start planning your trip with ease.',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 15,
+                      height: 1.6,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 34),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated.withValues(alpha: 0.95),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      border: Border.all(
+                        color: AppColors.border.withValues(alpha: 0.45),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.black.withValues(alpha: 0.16),
+                          blurRadius: 28,
+                          offset: const Offset(0, 14),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 28,
+                    ),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextFormField(
+                            controller: nameController,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (_) =>
+                                context.read<RegisterCubit>().resetState(),
+                            decoration: _inputDecoration(
+                              label: 'Full Name',
+                              icon: Icons.person,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your full name';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (_) =>
+                                context.read<RegisterCubit>().resetState(),
+                            decoration: _inputDecoration(
+                              label: 'Email',
+                              icon: Icons.email_rounded,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              if (!_validateEmail(value.trim())) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: passwordController,
+                            obscureText: !showPassword,
+                            textInputAction: TextInputAction.next,
+                            onChanged: (_) =>
+                                context.read<RegisterCubit>().resetState(),
+                            decoration:
+                                _inputDecoration(
+                                  label: 'Password (min. 6 characters)',
+                                  icon: Icons.lock_rounded,
+                                ).copyWith(
+                                  suffixIcon: IconButton(
+                                    splashRadius: 22,
+                                    icon: Icon(
+                                      showPassword
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        showPassword = !showPassword;
+                                      });
+                                    },
+                                  ),
+                                ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your password';
+                              }
+                              if (value.trim().length < 6) {
+                                return 'Password must be at least 6 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: confirmPasswordController,
+                            obscureText: !showPassword,
+                            textInputAction: TextInputAction.done,
+                            onChanged: (_) =>
+                                context.read<RegisterCubit>().resetState(),
+                            decoration: _inputDecoration(
+                              label: 'Confirm Password',
+                              icon: Icons.lock_outline,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please confirm your password';
+                              }
+                              if (value.trim() !=
+                                  passwordController.text.trim()) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          if (isLoading)
+                            const Center(child: CircularProgressIndicator())
+                          else
+                            ElevatedButton(
+                              onPressed: () {
+                                if (formKey.currentState?.validate() ?? false) {
+                                  context.read<RegisterCubit>().register(
+                                    nameController.text.trim(),
+                                    emailController.text.trim(),
+                                    passwordController.text.trim(),
+                                    confirmPasswordController.text.trim(),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                backgroundColor: AppColors.accent,
+                                foregroundColor: AppColors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.button,
+                                  ),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: const Text(
+                                'Create Account',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          const SizedBox(height: AppSpacing.md),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Already have an account?',
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  context.go(RoutePaths.login);
+                                },
+                                child: const Text('Sign In'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

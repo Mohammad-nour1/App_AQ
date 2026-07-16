@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:app_aq_2/core/constants/app_colors.dart';
-import 'package:app_aq_2/presentation/onboarding/screens/onboarding_screen.dart';
 import 'package:app_aq_2/presentation/splash/cubit/splash_cubit.dart';
 import 'package:app_aq_2/presentation/splash/cubit/splash_state.dart';
 import 'package:flutter/material.dart';
@@ -18,21 +17,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<SplashCubit>().initialize();
+    context.read<SplashCubit>().initialize(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<SplashCubit, SplashCubitState>(
       listener: (context, state) {
-        if (state is SplashCompleted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const OnboardingScreen(),
-            ),
-          );
-        }
+        // Navigation is handled by router redirect logic
+        // No manual navigation needed
       },
       child: Scaffold(
         body: Stack(
@@ -46,9 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
             /// Dark Overlay
             Container(
-              color: AppColors.overlayDark.withOpacity(
-                AppOpacity.high,
-              ),
+              color: AppColors.overlayDark.withValues(alpha: AppOpacity.high),
             ),
 
             /// Blur Effect

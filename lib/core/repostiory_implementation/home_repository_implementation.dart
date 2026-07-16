@@ -1,4 +1,5 @@
 import 'package:latlong2/latlong.dart';
+import '../error/exceptions.dart';
 
 import '../data/datasource.dart';
 import '../models/place.dart';
@@ -68,7 +69,13 @@ class HomeRepositoryImplementation extends HomeRepository {
 
   @override
   Place getPlaceById(id) {
-    return getAllPlaces().firstWhere((place) => place.id == id);
+    return getAllPlaces().firstWhere(
+      (place) => place.id == id,
+      orElse: () => throw CacheException(
+        code: 'not-found',
+        message: 'Place with id $id was not found',
+      ),
+    );
   }
 
   @override

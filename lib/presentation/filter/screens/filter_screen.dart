@@ -1,4 +1,3 @@
-import 'package:app_aq_2/core/constants/app_colors.dart';
 import 'package:app_aq_2/core/constants/app_radius.dart';
 import 'package:app_aq_2/core/models/place_categories.dart';
 import 'package:app_aq_2/core/router/router.dart';
@@ -85,8 +84,9 @@ class FilterScreen extends StatelessWidget {
                                     )
                                     .toList(),
                                 onSelected: (selectedCity) {
-                                  if (selectedCity != null)
+                                  if (selectedCity != null) {
                                     homeCubit.setFilterCity(selectedCity);
+                                  }
                                 },
                               ),
                             ),
@@ -118,8 +118,9 @@ class FilterScreen extends StatelessWidget {
                                           )
                                           .toList(),
                                   onSelected: (maxDistanse) {
-                                    if (maxDistanse != null)
+                                    if (maxDistanse != null) {
                                       homeCubit.setMaxDistance(maxDistanse);
+                                    }
                                   },
                                 ),
                               ),

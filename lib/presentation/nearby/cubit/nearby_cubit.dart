@@ -7,6 +7,8 @@ import 'package:app_aq_2/core/repository/home_repository.dart';
 import 'package:app_aq_2/core/utils/location_handler.dart';
 
 import 'nearby_state.dart';
+import 'package:app_aq_2/core/error/exception_mapper.dart';
+import 'package:app_aq_2/core/error/failures.dart';
 
 class NearbyCubit extends Cubit<NearbyState> {
   final HomeRepository _repo;
@@ -18,7 +20,11 @@ class NearbyCubit extends Cubit<NearbyState> {
 
   Future<void> loadPlaces(List<String> placeIds) async {
     if (placeIds.isEmpty) {
-      emit(NearbyError('No places found'));
+      emit(
+        NearbyError(
+          ValidationFailure(code: 'no-data', message: 'No places found'),
+        ),
+      );
       return;
     }
     try {
@@ -26,12 +32,17 @@ class NearbyCubit extends Cubit<NearbyState> {
       final places = _repo.getPlacesByIds(placeIds);
 
       if (places.isEmpty) {
-        emit(NearbyError('No places found'));
+        emit(
+          NearbyError(
+            ValidationFailure(code: 'no-data', message: 'No places found'),
+          ),
+        );
       } else {
         emit(NearbyLoaded(places: places));
       }
     } catch (e) {
-      emit(NearbyError(e.toString()));
+      final failure = mapExceptionToFailure(e);
+      emit(NearbyError(failure));
     }
   }
 

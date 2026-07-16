@@ -13,6 +13,7 @@ class RoutePaths {
   static const String filter = '/filter';
   static const String nearbyPlaces = '/nearby';
   static const String tripSuggestion = '/trip';
+  static const String tripPlan = '/trip-plan';
   static const String profile = '/profile';
   static const String home = '/home';
 }

@@ -129,6 +129,13 @@ class HomeCubit extends Cubit<HomeCubitState> {
         ? (state as HomeLoaded).copyWith(filterMode: mode)
         : state,
   );
+
+  void setPendingTargetPlace(String? placeId) {
+    if (state is HomeLoaded) {
+      emit((state as HomeLoaded).copyWith(pendingTargetPlaceId: placeId));
+    }
+  }
+
   void setFilterCity(String city) => emit(
     state is HomeLoaded
         ? (state as HomeLoaded).copyWith(selectedCity: city)

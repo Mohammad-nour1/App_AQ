@@ -17,11 +17,13 @@ import '../../../core/di/injector.dart';
 import '../../../core/repository/home_repository.dart';
 
 import '../../../core/widgets/widgets.dart';
+import '../../../core/responsive/responsive_builder.dart';
+import '../../../core/responsive/screen_type.dart';
 import '../cubit/place_details_cubit.dart';
 import '../cubit/place_details_state.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
-  PlaceDetailsScreen({super.key, required this.placeId});
+  const PlaceDetailsScreen({super.key, required this.placeId});
   final String placeId;
   @override
   State<PlaceDetailsScreen> createState() => _PlaceDetailsScreenState();
@@ -51,7 +53,33 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           builder: (context, state) {
             if (state is PlaceDetailLoading) return const LoadingIndicator();
             if (state is PlaceDetailLoaded) {
-              return _buildContent(context, context.screenHeight, state);
+              return ResponsiveBuilder(
+                builder: (context, screenType, width) {
+                  // For larger screens show side-by-side layout
+                  if (screenType != ScreenType.mobile) {
+                    return Padding(
+                      padding: const EdgeInsets.all(AppSpacing.xs),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: _buildContent(
+                              context,
+                              context.screenHeight,
+                              state,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(flex: 1, child: _buildSidePanel(state)),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return _buildContent(context, context.screenHeight, state);
+                },
+              );
             }
             if (state is PlaceDetailError) {
               return ErrorView(message: state.failure.message, onRetry: () {});
@@ -68,67 +96,98 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     final placeLocation = state.place.location;
     final routeInfo = state.routeInfo;
     return Padding(
-      padding: EdgeInsets.all(AppSpacing.xs),
-      child: ListView(
-        children: [
-          SizedBox(
-            height: screenHeight * 25 / 100,
-            child: topStackBuilder(placeD),
-          ),
+      padding: const EdgeInsets.all(AppSpacing.xs),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: double.infinity),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                height: screenHeight * 25 / 100,
+                child: topStackBuilder(placeD),
+              ),
 
-          SizedBox(height: AppSpacing.sm),
-          Center(
-            child: Text(placeLocation.address, style: AppTextStyles.bodyMedium),
-          ),
-          SizedBox(height: AppSpacing.sm),
-          Text(placeD.description),
-          SizedBox(height: AppSpacing.sm),
+              SizedBox(height: AppSpacing.sm),
+              Center(
+                child: Text(
+                  placeLocation.address,
+                  style: AppTextStyles.bodyMedium,
+                ),
+              ),
+              SizedBox(height: AppSpacing.sm),
+              Text(placeD.description),
+              SizedBox(height: AppSpacing.sm),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
-            child: Row(
-              children: [
-                Text(
-                  'View All',
-                  style: AppTextStyles.headlineSmall.copyWith(
-                    color: AppColors.white,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                child: Row(
+                  children: [
+                    Text(
+                      'View All',
+                      style: AppTextStyles.headlineSmall.copyWith(
+                        color: AppColors.white,
+                      ),
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 120.h, child: placeImagesBuilder(placeD.images)),
+              SizedBox(height: AppSpacing.md),
+              SizedBox(
+                height: 220.h,
+                child: mapSnapShotBuilder(
+                  placeD.location.latitude,
+                  placeD.location.longitude,
+                  state.routeInfo,
+                  state.userLocation,
+                ),
+              ),
+              if (routeInfo != null) ...[
+                if (routeInfo.distance != 0.0) ...[
+                  SizedBox(height: 15.h),
+                  Text(
+                    '🛣️ Distance: ${(routeInfo.distance / 1000).toStringAsFixed(1)} km',
                   ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                  onPressed: () {},
-                ),
+                ],
+                if (routeInfo.duration != 0.0) ...[
+                  SizedBox(height: 15.h),
+                  Text(
+                    '⏱️ Estimated time: ${(routeInfo.duration / 60).toStringAsFixed(0)} min',
+                  ),
+                ],
               ],
-            ),
+            ],
           ),
+        ),
+      ),
+    );
+  }
 
-          SizedBox(height: 120.h, child: placeImagesBuilder(placeD.images)),
-          SizedBox(height: AppSpacing.md),
-          SizedBox(
-            height: 220.h,
-            child: mapSnapShotBuilder(
-              placeD.location.latitude,
-              placeD.location.longitude,
-              state.routeInfo,
-              state.userLocation,
-            ),
-          ),
-          if (routeInfo != null) ...[
-            if (routeInfo.distance != 0.0) ...[
-              SizedBox(height: 15.h),
-              Text(
-                '🛣️ Distance: ${(routeInfo.distance / 1000).toStringAsFixed(1)} km',
-              ),
-            ],
-            if (routeInfo.duration != 0.0) ...[
-              SizedBox(height: 15.h),
-              Text(
-                '⏱️ Estimated time: ${(routeInfo.duration / 60).toStringAsFixed(0)} min',
-              ),
-            ],
+  Widget _buildSidePanel(PlaceDetailLoaded state) {
+    final place = state.place;
+    return Card(
+      color: AppColors.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(place.name, style: AppTextStyles.headlineSmall),
+            const SizedBox(height: AppSpacing.sm),
+            Text(place.description),
+            const SizedBox(height: AppSpacing.md),
+            Text('Address', style: AppTextStyles.headlineSmall),
+            const SizedBox(height: AppSpacing.xs),
+            Text(place.location.address),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -140,17 +199,19 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
         Positioned(
           child: BlocBuilder<HomeCubit, HomeCubitState>(
             builder: (context, state) {
+              final isFavorite = state is HomeLoaded
+                  ? (state as HomeLoaded).favoritesIndecies.contains(placeD.id)
+                  : false;
+
               return Container(
                 color: AppColors.overlayLight,
                 child: Row(
                   children: [
-                    Spacer(),
+                    const Spacer(),
                     favoriteButton(
                       () =>
                           context.read<HomeCubit>().toggleFavoriteId(placeD.id),
-                      (state as HomeLoaded).favoritesIndecies.contains(
-                        placeD.id,
-                      ),
+                      isFavorite,
                     ),
                   ],
                 ),

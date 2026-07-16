@@ -10,6 +10,7 @@ class RouteNames {
   static const String search = 'search';
   static const String nearbyPlaces = 'nearby-places';
   static const String tripSuggestion = 'trip-suggestion';
+  static const String tripPlan = 'trip-plan';
   static const String profile = 'profile';
   static const String home = 'home';
   static const String filter = 'filter';

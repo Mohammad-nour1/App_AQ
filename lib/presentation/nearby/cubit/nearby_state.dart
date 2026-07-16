@@ -1,4 +1,5 @@
 // nearby_state.dart
+import 'package:app_aq_2/core/error/failures.dart';
 import 'package:app_aq_2/core/models/place.dart';
 import 'package:app_aq_2/core/models/route_info.dart';
 import 'package:equatable/equatable.dart';
@@ -45,9 +46,9 @@ class NearbyLoaded extends NearbyState {
 }
 
 class NearbyError extends NearbyState {
-  final String message;
-  NearbyError(this.message);
+  final Failure failure;
+  NearbyError(this.failure);
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [failure];
 }

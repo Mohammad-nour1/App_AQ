@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../core/models/place.dart';
 import '../../../core/repository/home_repository.dart';
+import 'package:app_aq_2/core/error/exception_mapper.dart';
 
 class SearchCubit extends Cubit<SearchState> {
   SearchCubit(this._homeRepository) : super(SearchInitial());
@@ -29,7 +30,8 @@ class SearchCubit extends Cubit<SearchState> {
         final List<Place> searchResults = _homeRepository.search(query);
         emit(SearchLoaded(places: searchResults, destination: null));
       } catch (e) {
-        emit(SearchError(e.toString()));
+        final failure = mapExceptionToFailure(e);
+        emit(SearchError(failure));
       }
     });
   }
