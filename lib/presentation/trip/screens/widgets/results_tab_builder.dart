@@ -1,8 +1,9 @@
+import 'package:app_aq_2/core/constants/app_colors.dart';
+import 'package:app_aq_2/core/constants/app_spacing.dart';
 import 'package:app_aq_2/presentation/trip/screens/widgets/one_day_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/models/trip/trip_suggestion.dart';
-import '../../../../core/theme/theme.dart';
 import '../cubit/trip_cubit.dart';
 
 Widget buildResults(

@@ -1,6 +1,6 @@
 import 'package:app_aq_2/core/error/failures.dart';
+import 'package:app_aq_2/core/models/place/place.dart';
 import 'package:equatable/equatable.dart';
-import '../../../core/models/place.dart';
 
 abstract class TripState extends Equatable {
   const TripState();

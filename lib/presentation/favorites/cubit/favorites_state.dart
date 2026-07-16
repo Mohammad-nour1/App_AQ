@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:app_aq_2/core/error/failures.dart';
-import '../../../core/models/place.dart';
+import '../../../core/models/place/place.dart';
 
 abstract class FavoritesState extends Equatable {
   const FavoritesState();

@@ -1,8 +1,9 @@
+import 'package:app_aq_2/core/error/exception_mapper.dart';
+import 'package:app_aq_2/core/models/place/place_categories.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/models/place_categories.dart';
+
 import '../../../core/repository/home_repository.dart';
 import 'trip_state.dart';
-import 'package:app_aq_2/core/error/exception_mapper.dart';
 
 class TripCubit extends Cubit<TripState> {
   TripCubit(this._homeRepository) : super(TripInitial());

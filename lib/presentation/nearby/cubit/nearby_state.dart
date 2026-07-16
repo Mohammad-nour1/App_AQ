@@ -1,12 +1,6 @@
-// nearby_state.dart
-<<<<<<< HEAD
 import 'package:app_aq_2/core/error/failures.dart';
-import 'package:app_aq_2/core/models/place.dart';
-import 'package:app_aq_2/core/models/route_info.dart';
-=======
-import 'package:app_aq_2/core/models/place/place.dart';
 import 'package:app_aq_2/core/models/map/route_info.dart';
->>>>>>> origin/feature/home-details-filter-nearby-search
+import 'package:app_aq_2/core/models/place/place.dart';
 import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
 

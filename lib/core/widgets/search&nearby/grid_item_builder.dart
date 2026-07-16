@@ -7,7 +7,7 @@ import 'package:flutter_scalify/responsive_scale/responsive_extensions.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_cubit.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_state.dart';
 
-import '../../models/place.dart';
+import '../../models/place/place.dart';
 
 itemBuilder(Place place, VoidCallback setDestination) {
   return LayoutBuilder(
