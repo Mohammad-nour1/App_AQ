@@ -295,8 +295,14 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
               ],
             );
           }
-
-          return ErrorView(message: "Something went wrong", onRetry: () {});
+          if (state is HomeError) {
+            final failure = state.errorFaliure;
+            return ErrorView(
+              message: failure.message,
+              onRetry: () => context.read<HomeCubit>().load(),
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
     );

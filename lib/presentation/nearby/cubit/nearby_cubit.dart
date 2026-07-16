@@ -2,7 +2,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:app_aq_2/core/models/route_info.dart';
+import 'package:app_aq_2/core/models/map/route_info.dart';
 import 'package:app_aq_2/core/repository/home_repository.dart';
 import 'package:app_aq_2/core/utils/location_handler.dart';
 

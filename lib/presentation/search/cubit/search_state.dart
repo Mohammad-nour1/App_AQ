@@ -2,7 +2,7 @@ import 'package:app_aq_2/core/error/failures.dart';
 import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../core/models/place.dart';
+import '../../../core/models/place/place.dart';
 
 sealed class SearchState extends Equatable {}
 

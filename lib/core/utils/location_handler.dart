@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
 
-import '../models/route_info.dart';
+import '../models/map/route_info.dart';
 
 Future<LocationData?> getUserLocation() async {
   try {

@@ -1,8 +1,9 @@
+import 'package:app_aq_2/core/error/failures.dart';
 import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../core/models/place.dart';
-import '../../../core/models/place_categories.dart';
+import '../../../core/models/place/place.dart';
+import '../../../core/models/place/place_categories.dart';
 
 sealed class HomeCubitState extends Equatable {}
 
@@ -114,4 +115,12 @@ class HomeLoaded extends HomeCubitState {
     moveToFilter,
     pendingTargetPlaceId,
   ];
+}
+
+class HomeError extends HomeCubitState {
+  HomeError(this.errorFaliure);
+  final Failure errorFaliure;
+
+  @override
+  List<Object?> get props => [errorFaliure];
 }

@@ -1,6 +1,6 @@
 import 'package:app_aq_2/core/constants/app_radius.dart';
 import 'package:app_aq_2/core/extensions/context_extensions.dart';
-import 'package:app_aq_2/core/models/place.dart';
+import 'package:app_aq_2/core/models/place/place.dart';
 import 'package:app_aq_2/core/theme/theme.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_cubit.dart';
 import 'package:app_aq_2/presentation/home/cubit/home_state.dart';

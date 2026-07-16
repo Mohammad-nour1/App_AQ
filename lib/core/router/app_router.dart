@@ -244,6 +244,7 @@ GoRouter createAppRouter() {
       GoRoute(
         path: RoutePaths.tripSuggestion,
         name: RouteNames.tripSuggestion,
+<<<<<<< HEAD
         pageBuilder: (context, state) => CustomTransitionPage<void>(
           key: state.pageKey,
           child: BlocProvider(
@@ -265,6 +266,18 @@ GoRouter createAppRouter() {
             return FadeTransition(opacity: animation, child: child);
           },
         ),
+=======
+        pageBuilder: (context, state) {
+          return CustomTransitionPage<void>(
+            key: state.pageKey,
+            child: TripSuggestionScreen(),
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+          );
+        },
+>>>>>>> origin/feature/home-details-filter-nearby-search
       ),
       GoRoute(
         path: RoutePaths.filter,
