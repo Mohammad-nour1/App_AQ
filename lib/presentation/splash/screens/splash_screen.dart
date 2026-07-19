@@ -24,20 +24,19 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return BlocListener<SplashCubit, SplashCubitState>(
       listener: (context, state) {
-        // Navigation is handled by router redirect logic
-        // No manual navigation needed
+
       },
       child: Scaffold(
         body: Stack(
           fit: StackFit.expand,
           children: [
-            /// Background Image
+
             Image.asset(
               "assets/images/splash.jpg",
               fit: BoxFit.cover,
             ),
 
-            /// Dark Overlay
+            
             Container(
               color: AppColors.overlayDark.withValues(alpha: AppOpacity.high),
             ),
