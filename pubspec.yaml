@@ -82,9 +82,60 @@ flutter:
   - assets/images/omawi5.jpg
   - assets/images/omawi6.jpg
   - assets/images/souq.jpg
+  - assets/images/souq1.jpg
+  - assets/images/Mount_Qasioun.jpg
+  - assets/images/Mount_Qasioun1.jpg
+  - assets/images/national_museum_main.jpg
+  - assets/images/marjeh_main.jpg
+  - assets/images/marjeh_main1.jpg
+  - assets/images/Qasr_al-Azem.jpg
+  - assets/images/Qasr_al-Azem1.jpg
+  - assets/images/Qasr_al-Azem2.jpg
+  - assets/images/bab_sharqi.jpg
+  - assets/images/bab_sharqi1.jpg
+  - assets/images/salihiya.jpg
+  - assets/images/aleppo.jpg
+  - assets/images/aleppo1.jpg
+  - assets/images/aleppo2.jpg
+  - assets/images/mosque.jpg
+  - assets/images/mosque1.jpg
+  - assets/images/souq_aleppo.jpg
+  - assets/images/souq_aleppo1.jpg
+  - assets/images/castle_homs.jpg
+  - assets/images/castle_homs1.jpg
+  - assets/images/castle_homs2.jpg
+  - assets/images/Khalid_ib_ al-Walid.jpg
+  - assets/images/Khalid_ib_ al-Walid1.jpg
+  - assets/images/Khalid_ib_ al-Walid2.jpg
+  - assets/images/hama_.jpg
+  - assets/images/Latakia.jpg
+  - assets/images/Latakia4.jpg
+  - assets/images/Latakia1.jpg
+  - assets/images/Latakia2.jpg
+  - assets/images/Deir_ez-Zor.jpg
+  - assets/images/Deir_ez-Zor1.jpg
+  - assets/images/Hama.jpg
+  - assets/images/museum.jpg
+  - assets/images/River.jpg
+  - assets/images/River1.jpg
+  - assets/images/Raqqa.jpg
+  - assets/images/raqqa1.jpg
+  - assets/images/raqqa2.jpg
+  - assets/images/Hasakah.jpg
+  - assets/images/Hasakah2.jpg
+  - assets/images/Hasakah3.jpg
+  - assets/images/idlib.jpg
+  - assets/images/idlib1.jpg
+  - assets/images/idlib2.jpg
+  - assets/images/suwayda.jpg
+  - assets/images/suwayda1.jpg
+  - assets/images/kanwat.jpg
+  - assets/images/shahba.jpg
+  - assets/images/darra2.jpg
+  - assets/images/darra.jpg
 
 
-    
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
